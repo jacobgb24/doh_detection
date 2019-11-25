@@ -26,6 +26,8 @@ def get_ip(domain: str):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="")
     parser.add_argument('input', help="Input file of doh resolver domains", type=argparse.FileType('r'))
+    parser.add_argument('output', help="Output file to write resolver IPs to", type=argparse.FileType('w'))
+
     parser.add_argument('-r', '--resolver', help="The resolver to use for queries. Default is google",
                         default='8.8.8.8')
     parser.add_argument('-n', '--num-tries', help="The number of total times to try a query if NoAnswer is received. "
@@ -57,9 +59,5 @@ if __name__ == "__main__":
             p.join()
             print("Exiting early from queries.")
 
-    print("\n[", end="")
-    for i, ip in enumerate(ips):
-        print(f'"{ip}"', end="")
-        if i < len(ips) - 1:
-            print(", ", end="")
-    print(']')
+    for ip in ips:
+        args.output.write(f"{ip} ")

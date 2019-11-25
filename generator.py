@@ -1,6 +1,8 @@
 import requests
 import argparse
 import random
+
+from dns.edns import GenericOption
 from shared.packet_reader import PktReader
 import logging
 from tqdm import tqdm
@@ -18,7 +20,8 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def get_doh(resolver, query):
     headers = {"accept": "application/dns-message", 'host': resolver}
-    msg = dns.message.make_query(query, dns.rdatatype.from_text('TXT')).to_wire()
+    padding = GenericOption(12, bytearray([0] * random.randint(64, 128)))
+    msg = dns.message.make_query(query, dns.rdatatype.from_text('TXT'), options=[padding]).to_wire()
     msg = base64.urlsafe_b64encode(msg).decode('utf-8').strip("=")
     payload = {"dns": msg}
     url = "https://{}/dns-query".format(resolver)
